@@ -119,6 +119,3 @@ Ce qui va modifier notre fichier :
     
 # ....
 ```
-    
-
-
