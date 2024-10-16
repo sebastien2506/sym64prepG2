@@ -1,0 +1,153 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        body {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            animation: gradientBG 15s ease infinite;
+            background-size: 400% 400%;
+            overflow: hidden;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            z-index: 10;
+            position: relative;
+        }
+        
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(106, 142, 251, 0.25);
+        }
+        
+        .btn-primary {
+            background-color: #6a8efb;
+            border-color: #6a8efb;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #5a7eeb;
+            border-color: #5a7eeb;
+            transform: scale(1.05);
+        }
+
+        .code-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .code-drop {
+            position: absolute;
+            display: inline-block;
+            opacity: 0.8;
+            font-size: 24px;
+            animation: fall linear infinite;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            font-weight: bold;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px); }
+            100% { transform: translateY(100vh); }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="code-rain" id="codeRain"></div>
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <div class="card login-card shadow-sm p-4" style="width: 24rem;">
+            <form method="post">
+                {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+
+                {% if app.user %}
+                    <div class="mb-3">
+                        You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                    </div>
+                {% endif %}
+
+                <h1 class="h4 mb-3 fw-normal text-center">Please sign in</h1>
+
+                <div class="form-floating mb-3">
+                    <input type="text" value="{{ last_username }}" name="_username" id="username" class="form-control" placeholder="Username" autocomplete="username" required autofocus>
+                    <label for="username">Username</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="password" name="_password" id="password" class="form-control" placeholder="Password" autocomplete="current-password" required>
+                    <label for="password">Password</label>
+                </div>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Animation des champs de formulaire
+            document.querySelectorAll('.form-control').forEach(input => {
+                input.addEventListener('focus', (e) => {
+                    e.target.closest('.form-floating').style.transform = 'scale(1.05)';
+                });
+                input.addEventListener('blur', (e) => {
+                    e.target.closest('.form-floating').style.transform = 'scale(1)';
+                });
+            });
+
+            // Création de la pluie de logos
+            const codeRain = document.getElementById('codeRain');
+            const logos = ['<>', '{;}', '[]', '()', '#', '//', '{}', '||'];
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#FF9FF3', '#54A0FF'];
+
+            function createDrop() {
+                const drop = document.createElement('span');
+                drop.className = 'code-drop';
+                drop.style.left = Math.random() * window.innerWidth + 'px';
+                drop.style.animationDuration = Math.random() * 2 + 4 + 's';
+                drop.style.opacity = Math.random() * 0.3 + 0.7;
+                
+                const logoIndex = Math.floor(Math.random() * logos.length);
+                drop.textContent = logos[logoIndex];
+                drop.style.color = colors[logoIndex];
+
+                codeRain.appendChild(drop);
+
+                setTimeout(() => {
+                    drop.remove();
+                }, 6000);
+            }
+
+            setInterval(createDrop, 150);
+        });
+    </script>
+{% endblock %}
