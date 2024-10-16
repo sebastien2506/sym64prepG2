@@ -32,6 +32,9 @@ class Section
     #[ORM\ManyToMany(targetEntity: Post::class, mappedBy: 'sections')]
     private Collection $posts;
 
+    #[ORM\Column(length: 162,unique: true)]
+    private ?string $SectionSlug = null;
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
@@ -89,6 +92,18 @@ class Section
         if ($this->posts->removeElement($post)) {
             $post->removeSection($this);
         }
+
+        return $this;
+    }
+
+    public function getSectionSlug(): ?string
+    {
+        return $this->SectionSlug;
+    }
+
+    public function setSectionSlug(string $SectionSlug): static
+    {
+        $this->SectionSlug = $SectionSlug;
 
         return $this;
     }

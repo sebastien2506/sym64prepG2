@@ -68,6 +68,9 @@ class Post
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[ORM\Column(length: 162,unique: true)]
+    private ?string $postSlug = null;
+
     public function __construct()
     {
         $this->sections = new ArrayCollection();
@@ -226,6 +229,18 @@ class Post
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getPostSlug(): ?string
+    {
+        return $this->postSlug;
+    }
+
+    public function setPostSlug(string $postSlug): static
+    {
+        $this->postSlug = $postSlug;
 
         return $this;
     }
